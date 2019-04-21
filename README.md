@@ -10,10 +10,11 @@ The simplest representation of topology is in array `Array{Faces{3,Int},1}` for 
 
 The lookup operations implemented are:
 
-    + `Faces(topology)` an iterable over faces
-    + `Edges(topology)` an iterable over edges
-    + `VertexRing(topology,v)` an iterable over vertices around `v`
-    + `EdgeRing(topology,v)` an iterable over ring edges around `v`
+   + `Faces(topology)` an iterable over faces
+   + `Edges(topology)` an iterable over edges
+   + `VertexRing(topology,v)` an iterable over vertices around `v`
+   + `EdgeRing(topology,v)` an iterable over ring edges around `v`
+    
 There is also `FaceRing(topology,v)` returning iterable over face index with common `v`, which I have never used and seems to be ambigious for edge data structures. Thus it might be removed from this package.
 
 At the moment no topological operations are implemented in this package. Highly desirable methods are:
