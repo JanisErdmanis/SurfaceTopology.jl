@@ -1,5 +1,6 @@
 module SurfaceTopology
 
+
 using GeometryTypes
 
 include("primitives.jl")
@@ -7,7 +8,9 @@ include("plainds.jl")
 include("faceds.jl")
 include("cachedds.jl")
 
-export FaceDS, CachedDS
+include("edgeds.jl")
+
+export FaceDS, CachedDS, EdgeDS
 export FaceRing, VertexRing, EdgeRing
 export Edges,Faces
 

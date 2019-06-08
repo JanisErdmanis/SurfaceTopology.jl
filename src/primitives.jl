@@ -12,8 +12,43 @@ end
 
 struct VertexRing{T}
     v::Int
+    start::Union{Int,Nothing}
     t::T # topology
 end
+
+VertexRing(v::Int,t) = VertexRing(v,nothing,t)
+### Perhaps one may also consider to make a trait
+
+
+### With this pairiterator I now can initialize EdgeRing as iterator from VertexRing. 
+struct PairIterator
+    iter
+end
+
+function Base.iterate(iter::PairIterator)
+    i1,state1 = iterate(iter.iter)
+    i2, state2 = iterate(iter.iter,state1)
+    return Face(i1,i2),(state2,i2)
+end
+
+function Base.iterate(iter::PairIterator,state)
+
+    if state==nothing
+        return nothing        
+    end
+
+    state1,i1 = state
+    step = iterate(iter.iter,state1)
+
+    if step==nothing
+        i2,state2 = iterate(iter.iter)
+        return Face(i1,i2), nothing
+    else
+        i2, state2 = step
+        return Face(i1,i2),(state2,i2)
+    end
+end
+
 
 function Base.collect(iter::Union{FaceRing,VertexRing})
     collection = Int[] 
@@ -24,6 +59,14 @@ function Base.collect(iter::Union{FaceRing,VertexRing})
 end
 
 function Base.collect(iter::EdgeRing)
+    collection = Face{2,Int}[] 
+    for i in iter
+        push!(collection,i)
+    end
+    return collection
+end
+
+function Base.collect(iter::PairIterator)
     collection = Face{2,Int}[] 
     for i in iter
         push!(collection,i)

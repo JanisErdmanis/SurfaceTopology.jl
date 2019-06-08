@@ -73,75 +73,26 @@ function Base.iterate(iter::FaceRing{FaceDS},ti)
     end
 end
 
-function start(iter::EdgeRing{FaceDS})
-    vface = iter.t.vfaces[iter.v]
-    i0 = 1
-    return (i0,vface)
-end
+VertexRing(v::Int,t::FaceDS) = VertexRing(v,t.vfaces[v],t)
 
-function done(iter::EdgeRing{FaceDS},state::Tuple{Int,Int})
-    i, face = state
-    i0, vface = start(iter)
-    if !(i==i0) & (face==vface)
-        return true
-    else
-        return false
-    end    
-end
-
-function next(iter::EdgeRing{FaceDS},state::Tuple{Int,Int})
-
-    i, tri = state
-    v = iter.v
-    face = iter.t.faces[tri]
-    neighbours = iter.t.neighs[tri]
-
-    index = face.==v
-    w = index[[1,2,3]]
-    cw = index[[3,1,2]]
-    ccw = index[[2,3,1]]
-
-    nexttri, = neighbours[cw]
-
-    if nexttri==-1
-        error("The surface is not closed")
-    end
-    
-    return (face[cw]...,face[ccw]...), (i+1,nexttri)
-end
-
-Base.iterate(iter::EdgeRing{FaceDS}) = next(iter,start(iter))
-function Base.iterate(iter::EdgeRing{FaceDS},ti)
-    if done(iter,ti)
-        return nothing
-    else
-        return next(iter,ti)
-    end
-end
-
-function start(iter::VertexRing{FaceDS})
-    vface = iter.t.vfaces[iter.v]
-    i0 = 1
-    return (i0,vface)
-end
 
 function done(iter::VertexRing{FaceDS},state::Tuple{Int,Int})
     i, face = state
-    if !(i==1) & (face==iter.t.vfaces[iter.v])
+    if !(i==1) & (face==iter.t.vfaces[iter.v]) 
         return true
     else
         return false
     end    
 end
 
-function next(iter::VertexRing{FaceDS},state::Tuple{Int,Int})
+function next(iter::VertexRing{FaceDS},tri::Int)
 
-    i, tri = state
     v = iter.v
+    
     face = iter.t.faces[tri]
     neighbours = iter.t.neighs[tri]
 
-    index = face.==v
+    index = face .== v
     w = index[[1,2,3]]
     cw = index[[3,1,2]]
 
@@ -156,15 +107,24 @@ function next(iter::VertexRing{FaceDS},state::Tuple{Int,Int})
     face = iter.t.faces[tri]
     cw = (face.==v)[[3,1,2]]
     vi, = face[cw]
-    
-    return vi, (i+1,nexttri)
+
+    return vi, nexttri
 end
 
-Base.iterate(iter::VertexRing{FaceDS}) = next(iter,start(iter))
+function Base.iterate(iter::VertexRing{FaceDS})
+    face = iter.start
+    return next(iter,face)
+end
+    
 function Base.iterate(iter::VertexRing{FaceDS},ti)
-    if done(iter,ti)
+    if ti==iter.start
         return nothing
     else
         return next(iter,ti)
     end
+end
+
+function EdgeRing(v::Int,t::FaceDS)
+    iter = VertexRing(v,t)
+    return PairIterator(iter)
 end

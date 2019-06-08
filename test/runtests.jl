@@ -25,7 +25,6 @@ faces =   Face{3,Int}[
 
 triangles = []
 for i in FaceRing(5,faces)
-    #println("i")
     push!(triangles,i)
 end
 
@@ -46,7 +45,7 @@ end
 
 @test sort(verticies)==[1,4,7,8,9,10,11,12] #[1,2,6,7]
 
-@info "Testing Complex DS"
+@info "Testing FaceDS"
 
 # points = zero(faces)
 fb = FaceDS(faces)
@@ -71,6 +70,24 @@ end
 
 @test sort(verticies)==[1,4,7,8,9,10,11,12]
 
+@info "Testing EdgeDS"
+
+eb = EdgeDS(faces)
+
+verticies = []
+for i in VertexRing(5,eb)
+     push!(verticies,i)
+end
+
+@test sort(verticies)==[1,4,7,8,9,10,11,12]
+
+triverticies = []
+for i in EdgeRing(5,eb)
+    push!(triverticies,i)
+end
+
+@test (1,4) in triverticies
+
 @info "Topology tests for Cached DS"
 
 # At the moment limited to a closed surfaces
@@ -81,27 +98,9 @@ faces = Face{3,Int64}[
     [4, 9, 10], [5, 10, 6], [3, 5, 12], [7, 3, 11], [9, 7, 8], [10, 9, 2] 
 ]
 
-# using JLD
-# data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
-# #data = load("sphere.jld")
-# faces = data["faces"]
-
 cds = CachedDS(faces)
 
 @test sort(collect(VertexRing(3,faces)))==sort(collect(VertexRing(3,cds)))
 
 @test sort(collect(EdgeRing(3,faces)))==sort(collect(EdgeRing(3,cds)))
 
-# verticies = []
-# for i in VertexVRing(1,con)
-#     push!(verticies,i)
-# end
-
-# @test sort(verticies)==[2,4,5,14,15]
-
-# triverticies = []
-# for i in DoubleVertexVRing(1,con)
-#     push!(triverticies,i)
-# end
-
-# @test (2,14) in triverticies

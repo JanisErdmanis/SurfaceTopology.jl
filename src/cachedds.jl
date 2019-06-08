@@ -6,7 +6,6 @@ end
 Faces(t::CachedDS) = t.faces
 Edges(t::CachedDS) = filter(x->x[1]<x[2],decompose(Face{2,Int},t.faces)) 
 
-
 function CachedDS(faces)
     vmax = maximum(maximum(faces))
     connectivity = Array{Int,1}[]
@@ -29,6 +28,6 @@ function CachedDS(faces)
     return CachedDS(faces,connectivity)
 end
 
-VertexRing{CachedDS}(vi,t) = t.connectivity[vi]
-EdgeRing{CachedDS}(vi,t) = (Face(v1,v2) for (v1,v2) in zip(t.connectivity[vi][1:end],[t.connectivity[vi][2:end];t.connectivity[vi][1]]))
-FaceRing{CachedDS}(vi,t) = error("Face ring is not suitable for this datastructure.")
+VertexRing(vi::Int64,t::CachedDS) = t.connectivity[vi]
+EdgeRing(vi::Int64,t::CachedDS) = PairIterator(t.connectivity[vi]) 
+FaceRing(vi::Int64,t::CachedDS) = error("Face ring is not suitable for this datastructure.")
