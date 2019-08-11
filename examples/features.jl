@@ -23,9 +23,6 @@
 using GeometryTypes
 using SurfaceTopology
 
-@info "Topology function tests"
-
-
 faces = Face{3,Int64}[
     [1, 12, 6], [1, 6, 2], [1, 2, 8], [1, 8, 11], [1, 11, 12], [2, 6, 10], [6, 12, 5], 
     [12, 11, 3], [11, 8, 7], [8, 2, 9], [4, 10, 5], [4, 5, 3], [4, 3, 7], [4, 7, 9],  
