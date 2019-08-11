@@ -61,7 +61,7 @@ for i in EdgeRing(5,fb)
     push!(triverticies,i)
 end
 
-@test (1,4) in triverticies
+@test Face(1,4) in triverticies
 
 verticies = []
 for i in VertexRing(5,fb)
@@ -86,7 +86,7 @@ for i in EdgeRing(5,eb)
     push!(triverticies,i)
 end
 
-@test (1,4) in triverticies
+@test Face(1,4) in triverticies
 
 @info "Topology tests for Cached DS"
 
