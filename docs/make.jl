@@ -6,6 +6,6 @@ Literate.markdown(joinpath(@__DIR__, "../examples/features.jl"), joinpath(@__DIR
 
 makedocs(sitename="SurfaceTopology.jl",pages = ["index.md"])
 
-# deploydocs(
-#     repo = "github.com/akels/SurfaceTopology.jl.git",
-# )
+deploydocs(
+     repo = "github.com/akels/SurfaceTopology.jl.git",
+ )
