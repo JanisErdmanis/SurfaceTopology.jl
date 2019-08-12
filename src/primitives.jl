@@ -5,11 +5,23 @@ struct FaceRing{T}
     t::T # topology
 end
 
+
+"""
+    EdgeRing(v,t)
+
+Construct an edge ring iterator at vertex `v` from a given topology `t`. 
+"""
 struct EdgeRing{T}
     v::Int
     t::T # topology
 end
 
+
+"""
+    VertexRing(v,t)
+
+Construct a vertex ring iterator at vertex `v` from a given topology `t`. 
+"""
 struct VertexRing{T}
     v::Int
     start::Union{Int,Nothing}
@@ -21,6 +33,7 @@ VertexRing(v::Int,t) = VertexRing(v,nothing,t)
 
 
 ### With this pairiterator I now can initialize EdgeRing as iterator from VertexRing. 
+
 struct PairIterator
     iter
 end

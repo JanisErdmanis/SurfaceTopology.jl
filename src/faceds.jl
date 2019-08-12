@@ -1,12 +1,20 @@
+"""
+A face based datastructure storing faces, neighbour face indices and vertex to face map arrays. 
+"""
 struct FaceDS
     faces::Array{Face{3,Int},1}
-    neighs::Array{Face{3,Int},1} ### For now keeping simple
+    neighs::Array{Face{3,Int},1}
     vfaces::Array{Int,1}
 end
 
 Faces(t::FaceDS) = t.faces
 Edges(t::FaceDS) = filter(x->x[1]<x[2],decompose(Face{2,Int},t.faces))
 
+"""
+    FaceDS(faces::PlainDS)
+
+Constructs a face based datastructure from PlainDS. Returns a struct FaceDS with original faces, computed neighbour faces and vertex to face map (one face for each vertex).  
+"""
 function FaceDS(faces::PlainDS)
 
     vfaces = Array{Int}(undef,maximum(maximum(faces)))

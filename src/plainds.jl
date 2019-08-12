@@ -1,3 +1,7 @@
+@doc "`Faces(t)` returns an iterator for faces from representation of topology `t`" Faces
+@doc "`Edges(t)` returns an iterator for edges from representation of topology `t`" Edges
+
+
 Faces(t::PlainDS) = t
 Edges(t::PlainDS) = filter(x->x[1]<x[2],decompose(Face{2,Int},t)) ### Hopefully works
 

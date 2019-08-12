@@ -6,13 +6,13 @@
 
 # Fortunatelly it is possible to abstract queries of the topology through iterators:
 # ```@docs
-# Faces(topology)
-# Edges(topology)
+# Faces
+# Edges
 # ```
 # and circulators:
 # ```@docs
-# VertexRing(topology,v)
-# EdgeRing(topology,v)
+# VertexRing
+# EdgeRing
 # ```
 
 
@@ -48,6 +48,7 @@ collect(EdgeRing(3,faces))
 # The simplest extension is just a plain caching implemented under `CacheDS` which for each vertex stores it's surrounding verticies.
 # ```@docs
 # CachedDS
+# CachedDS(::SurfaceTopology.PlainDS)
 # ```
 # which can be initialised from `PlainDS`
 cachedtopology = CachedDS(faces)
@@ -57,6 +58,7 @@ collect(VertexRing(3,cachedtopology))
 # A more advanced datastructure is a face based datastructure which in this library is defined as `FaceDS` which additionally for each face stores 3 neigbouring face indicies.
 # ```@docs
 # FaceDS
+# FaceDS(::SurfaceTopology.PlainDS)
 # ```
 # which again can be initialised from `PlainDS`
 facedstopology = FaceDS(faces)

@@ -7,14 +7,17 @@ function findtwin(edges,e)
     end
 end
 
+"""
+    EdgeDS(faces::PlainDS)
 
+Constructs and returns edge based datastructure `EdgeDS` from plain face based datastructure PlainDS. Half edge based datastructure `EdgeDS` stores list of edges consisting of base vertex, next edge index and twin edge index.
+"""
 struct EdgeDS
     edges::Array{Face{3,Int},1} ### It is equal to PlainDS. That is why we should introduce a new type. 
     
     # row is data assciated with edge. It contains a base vertex, next edge and the twin edge
     #neighs::Array{Face{3,Int},1} ### For now keeping simple
     #vfaces::Array{Int,1}
-
     function EdgeDS(faces::PlainDS)
 
         edges = decompose(Face{2,Int},faces)

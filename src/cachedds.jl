@@ -1,3 +1,6 @@
+"""
+A datastructure which in addition to a list of faces stores connectivity information for each vertex.
+"""
 struct CachedDS
     faces
     connectivity
@@ -6,6 +9,11 @@ end
 Faces(t::CachedDS) = t.faces
 Edges(t::CachedDS) = filter(x->x[1]<x[2],decompose(Face{2,Int},t.faces)) 
 
+"""
+    CacheDS(t)
+
+Constructs cached face based datastructure `CachedDS` from arbitrary topology `t` which provides `EdgeRing` iterator. 
+"""
 function CachedDS(faces)
     vmax = maximum(maximum(faces))
     connectivity = Array{Int,1}[]
