@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Intorduction · SurfaceTopology.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>SurfaceTopology.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href>Intorduction</a><ul class="internal"><li><a class="toctext" href="#API-1">API</a></li><li><a class="toctext" href="#Data-structures-1">Data structures</a></li><li><a class="toctext" href="#Wishlist-1">Wishlist</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Intorduction</a></li></ul><a class="edit-page" href="https://github.com/akels/SurfaceTopology.jl/blob/master/examples/features.jl"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Intorduction</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Intorduction-1" href="#Intorduction-1">Intorduction</a></h1><p>As we know, triangular meshes can be stored in a computer in multiple different ways, each having strength and weaknesses in a particular case at hand. But it is not always clear which data structure would be most suitable for a specific task. Thus it is wise to write a data structure generic code which is the precise purpose of this package for closed oriented closed surfaces.</p><p>The most straightforward representation of triangular mesh topology is in array <code>Array{Faces{3,Int},1}</code> containing a list of triangular faces which are defined by their vertices. That as name stands allows quick iteration over faces and also edges. However, often in a numerical code one wants not only to iterate over faces or vertices but also in case of singularity subtraction, integration and local property estimation like in normal vector and curvature calculations to know what are neighbouring vertices surrounding a given vertex while keeping track of the orientation of the normals. Also, one wishes to modify the topology itself by collapsing, flipping and splitting edges. And that is why different data structures are needed for different problems.</p><p>Fortunately, it is possible to abstract mesh topology queries through iterators:</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.Faces" href="#SurfaceTopology.Faces"><code>SurfaceTopology.Faces</code></a> — <span class="docstring-category">Function</span>.</div><div><div><p><code>Faces(t)</code> returns an iterator for faces from representation of topology <code>t</code></p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/plainds.jl#L1">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.Edges" href="#SurfaceTopology.Edges"><code>SurfaceTopology.Edges</code></a> — <span class="docstring-category">Function</span>.</div><div><div><p><code>Edges(t)</code> returns an iterator for edges from representation of topology <code>t</code></p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/plainds.jl#L2">source</a></section><p>and circulators:</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.VertexRing" href="#SurfaceTopology.VertexRing"><code>SurfaceTopology.VertexRing</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">VertexRing(v,t)</code></pre><p>Construct a vertex ring iterator at vertex <code>v</code> from a given topology <code>t</code>. </p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/primitives.jl#L20-L24">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.EdgeRing" href="#SurfaceTopology.EdgeRing"><code>SurfaceTopology.EdgeRing</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">EdgeRing(v,t)</code></pre><p>Construct an edge ring iterator at vertex <code>v</code> from a given topology <code>t</code>. </p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/primitives.jl#L9-L13">source</a></section><h2><a class="nav-anchor" id="API-1" href="#API-1">API</a></h2><p>The package implements multiple kinds of data structures. The simplest one is <code>PlainDS</code> one which stores a list of faces and is just an alias to <code>Array{Faces{3,Int},1}</code>. As an example of how that works, let&#39;s define the data structure.</p><pre><code class="language-julia">using GeometryTypes
+using SurfaceTopology
+
+faces = Face{3,Int64}[
+    [1, 12, 6], [1, 6, 2], [1, 2, 8], [1, 8, 11], [1, 11, 12], [2, 6, 10], [6, 12, 5],
+    [12, 11, 3], [11, 8, 7], [8, 2, 9], [4, 10, 5], [4, 5, 3], [4, 3, 7], [4, 7, 9],
+    [4, 9, 10], [5, 10, 6], [3, 5, 12], [7, 3, 11], [9, 7, 8], [10, 9, 2]
+]</code></pre><pre><code class="language-none">20-element Array{GeometryTypes.Face{3,Int64},1}:
+ [1, 12, 6] 
+ [1, 6, 2]  
+ [1, 2, 8]  
+ [1, 8, 11] 
+ [1, 11, 12]
+ [2, 6, 10] 
+ [6, 12, 5] 
+ [12, 11, 3]
+ [11, 8, 7] 
+ [8, 2, 9]  
+ [4, 10, 5] 
+ [4, 5, 3]  
+ [4, 3, 7]  
+ [4, 7, 9]  
+ [4, 9, 10] 
+ [5, 10, 6] 
+ [3, 5, 12] 
+ [7, 3, 11] 
+ [9, 7, 8]  
+ [10, 9, 2] </code></pre><p>We can use the data structure <code>PlainDS</code> for the queries. The iterators, for example.</p><pre><code class="language-julia">collect(Faces(faces))</code></pre><pre><code class="language-none">20-element Array{GeometryTypes.Face{3,Int64},1}:
+ [1, 12, 6] 
+ [1, 6, 2]  
+ [1, 2, 8]  
+ [1, 8, 11] 
+ [1, 11, 12]
+ [2, 6, 10] 
+ [6, 12, 5] 
+ [12, 11, 3]
+ [11, 8, 7] 
+ [8, 2, 9]  
+ [4, 10, 5] 
+ [4, 5, 3]  
+ [4, 3, 7]  
+ [4, 7, 9]  
+ [4, 9, 10] 
+ [5, 10, 6] 
+ [3, 5, 12] 
+ [7, 3, 11] 
+ [9, 7, 8]  
+ [10, 9, 2] </code></pre><p>and</p><pre><code class="language-julia">collect(Edges(faces))</code></pre><pre><code class="language-none">30-element Array{GeometryTypes.Face{2,Int64},1}:
+ [1, 12] 
+ [1, 6]  
+ [1, 2]  
+ [2, 8]  
+ [1, 8]  
+ [8, 11] 
+ [1, 11] 
+ [11, 12]
+ [2, 6]  
+ [6, 10] 
+ ⋮       
+ [4, 9]  
+ [9, 10] 
+ [5, 10] 
+ [3, 5]  
+ [5, 12] 
+ [3, 11] 
+ [7, 8]  
+ [8, 9]  
+ [2, 10] </code></pre><p>giving us desirable output.</p><p>We can also ask what neighbouring vertices and edges for a particular vertex by using circulators. For this simple data structure that requires us to do a full lookup on the face list, which is nicely abstracted away:</p><pre><code class="language-julia">collect(VertexRing(3,faces))</code></pre><pre><code class="language-none">5-element Array{Int64,1}:
+ 12
+  4
+  7
+  5
+ 11</code></pre><p>and</p><pre><code class="language-julia">collect(EdgeRing(3,faces))</code></pre><pre><code class="language-none">5-element Array{GeometryTypes.Face{2,Int64},1}:
+ [12, 11]
+ [4, 5]  
+ [7, 4]  
+ [5, 12] 
+ [11, 7] </code></pre><p>In practice, one should use <code>EdgeRing</code> over <code>VertexRing</code> since, in the latter one, vertices are not ordered and thus can not be used for example to deduce the direction of the normal vector.</p><h2><a class="nav-anchor" id="Data-structures-1" href="#Data-structures-1">Data structures</a></h2><p>The same API works for all other data structures. There is a data structure <code>CachedDS</code> built on top of <code>PlainDS</code> stores closest vertices (vertex ring). Then there is a data structure <code>FaceDS</code> which with <code>PlainDS</code> also stores neighbouring faces which have a common edge. And then there is the most commonly used data structure in numerics <code>HalfEdgeDS</code> (implemented as <code>EdgeDS</code>).</p><p>The most straightforward extension of <code>PlainDS</code> is just a plain caching of neighbouring vertices for each vertex which are stored in <code>CacheDS</code> also with the list of faces.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.CachedDS" href="#SurfaceTopology.CachedDS"><code>SurfaceTopology.CachedDS</code></a> — <span class="docstring-category">Type</span>.</div><div><div><p>A datastructure which in addition to a list of faces stores connectivity information for each vertex.</p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/cachedds.jl#L1-L3">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.CachedDS-Tuple{Array{GeometryTypes.Face{3,Int64},1}}" href="#SurfaceTopology.CachedDS-Tuple{Array{GeometryTypes.Face{3,Int64},1}}"><code>SurfaceTopology.CachedDS</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">CacheDS(t)</code></pre><p>Constructs cached face based datastructure <code>CachedDS</code> from arbitrary topology <code>t</code> which provides <code>EdgeRing</code> iterator. </p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/cachedds.jl#L12-L16">source</a></section><p>which can be initialised from <code>PlainDS</code></p><pre><code class="language-julia">cachedtopology = CachedDS(faces)</code></pre><pre><code class="language-none">CachedDS(GeometryTypes.Face{3,Int64}[[1, 12, 6], [1, 6, 2], [1, 2, 8], [1, 8, 11], [1, 11, 12], [2, 6, 10], [6, 12, 5], [12, 11, 3], [11, 8, 7], [8, 2, 9], [4, 10, 5], [4, 5, 3], [4, 3, 7], [4, 7, 9], [4, 9, 10], [5, 10, 6], [3, 5, 12], [7, 3, 11], [9, 7, 8], [10, 9, 2]], Array{Int64,1}[[6, 2, 8, 11, 12], [6, 10, 9, 8, 1], [11, 7, 4, 5, 12], [5, 3, 7, 9, 10], [12, 3, 4, 10, 6], [12, 5, 10, 2, 1], [8, 9, 4, 3, 11], [2, 9, 7, 11, 1], [2, 10, 4, 7, 8], [6, 5, 4, 9, 2], [8, 7, 3, 12, 1], [1, 11, 3, 5, 6]])</code></pre><p>And the same API can be used for querries:</p><pre><code class="language-julia">collect(VertexRing(3,cachedtopology))</code></pre><pre><code class="language-none">5-element Array{Int64,1}:
+ 11
+  7
+  4
+  5
+ 12</code></pre><p>A more advanced data structure is a face based data structure <code>FaceDS</code> which additionally for each face stores three neighbouring face indices.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.FaceDS" href="#SurfaceTopology.FaceDS"><code>SurfaceTopology.FaceDS</code></a> — <span class="docstring-category">Type</span>.</div><div><div><p>A face based datastructure storing faces, neighbour face indices and vertex to face map arrays. </p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/faceds.jl#L1-L3">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.FaceDS-Tuple{Array{GeometryTypes.Face{3,Int64},1}}" href="#SurfaceTopology.FaceDS-Tuple{Array{GeometryTypes.Face{3,Int64},1}}"><code>SurfaceTopology.FaceDS</code></a> — <span class="docstring-category">Method</span>.</div><div><div><pre><code class="language-julia">FaceDS(faces::PlainDS)</code></pre><p>Constructs a face based datastructure from PlainDS. Returns a struct FaceDS with original faces, computed neighbour faces and vertex to face map (one face for each vertex).  </p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/faceds.jl#L13-L17">source</a></section><p>which again can be initialised from <code>PlainDS</code></p><pre><code class="language-julia">facedstopology = FaceDS(faces)</code></pre><pre><code class="language-none">FaceDS(GeometryTypes.Face{3,Int64}[[1, 12, 6], [1, 6, 2], [1, 2, 8], [1, 8, 11], [1, 11, 12], [2, 6, 10], [6, 12, 5], [12, 11, 3], [11, 8, 7], [8, 2, 9], [4, 10, 5], [4, 5, 3], [4, 3, 7], [4, 7, 9], [4, 9, 10], [5, 10, 6], [3, 5, 12], [7, 3, 11], [9, 7, 8], [10, 9, 2]], GeometryTypes.Face{3,Int64}[[7, 2, 5], [6, 3, 1], [10, 4, 2], [9, 5, 3], [8, 1, 4], [16, 20, 2], [17, 16, 1], [18, 17, 5], [19, 18, 4], [20, 19, 3], [16, 12, 15], [17, 13, 11], [18, 14, 12], [19, 15, 13], [20, 11, 14], [6, 7, 11], [7, 8, 12], [8, 9, 13], [9, 10, 14], [10, 6, 15]], [1, 2, 8, 11, 7, 1, 9, 3, 10, 6, 4, 1])</code></pre><p>and what would one expect</p><pre><code class="language-julia">collect(VertexRing(3,facedstopology))</code></pre><pre><code class="language-none">5-element Array{Int64,1}:
+ 12
+ 11
+  7
+  4
+  5</code></pre><p>works.</p><p>All previous ones were some forms of face-based data structures. More common (by my own impression) the numerical world uses edge-based data structures. This package implements half-edge data structure <code>EdgeDS</code> which stores a list of edges by three numbers - base vertex index, next edge index and twin edge index.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="SurfaceTopology.EdgeDS" href="#SurfaceTopology.EdgeDS"><code>SurfaceTopology.EdgeDS</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">EdgeDS(faces::PlainDS)</code></pre><p>Constructs and returns edge based datastructure <code>EdgeDS</code> from plain face based datastructure PlainDS. Half edge based datastructure <code>EdgeDS</code> stores list of edges consisting of base vertex, next edge index and twin edge index.</p></div></div><a class="source-link" target="_blank" href="https://github.com/akels/SurfaceTopology.jl/blob/da31ee3ff9309fa703a83a0d6858db6c2c7496bb/src/edgeds.jl#L10-L14">source</a></section><p>To initialise this datastructure one executes:</p><pre><code class="language-julia">edgedstopology = EdgeDS(faces)</code></pre><pre><code class="language-none">EdgeDS(GeometryTypes.Face{3,Int64}[[1, 2, 15], [12, 3, 19], [6, 1, 4], [1, 5, 3], [6, 6, 16], [2, 4, 7], [1, 8, 6], [2, 9, 28], [8, 7, 10], [1, 11, 9]  …  [12, 49, 24], [7, 53, 38], [3, 54, 23], [11, 52, 27], [9, 56, 41], [7, 57, 26], [8, 55, 30], [10, 59, 44], [9, 60, 29], [2, 58, 18]])</code></pre><pre><code class="language-julia">collect(VertexRing(3,edgedstopology))</code></pre><pre><code class="language-none">5-element Array{Int64,1}:
+ 12
+ 11
+  7
+  4
+  5</code></pre><h2><a class="nav-anchor" id="Wishlist-1" href="#Wishlist-1">Wishlist</a></h2><p>At the moment the package is able only to answer queries, but it would be desirable also to be able to do topological surgery operations. For completeness, those would include.</p><ul><li><code>edgeflip(topology,edge)</code></li><li><code>edgesplit(topology,edge)</code></li><li><code>edgecollapse(topology,edge)</code></li></ul><p>And with them even a method for <code>defragmenting</code> the topology (actually trivial if we generalize constructors as in <code>CachedDS</code>). Unfortunately, at the moment, I am not working with anything geometry related thus the development of that on my own will be slow. I hope that the clarity and simplicity of this package could serve someone as a first step, and so eventually, topological operations would be implemented out of necessity.</p><footer><hr/></footer></article></body></html>
